@@ -1,7 +1,6 @@
 library pin_view;
 
 import 'package:flutter/material.dart';
-import 'package:sms/sms.dart';
 
 class SmsListener {
   final String from;
@@ -48,36 +47,16 @@ class _PinViewState extends State<PinView> {
   List<TextEditingController> _controllers;
   List<FocusNode> _focusNodes;
   List<String> _pin;
-  SmsReceiver _smsReceiver;
 
   @override
   void initState() {
     super.initState();
-    if (widget.sms != null) {
-      _listenSms();
-    }
+
     _pin = List<String>.generate(widget.count, (int index) => "");
     _focusNodes =
         List.generate(widget.count, (int index) => FocusNode()).toList();
     _controllers =
         List.generate(widget.count, (int index) => TextEditingController());
-  }
-
-  void _listenSms() async {
-    _smsReceiver = SmsReceiver();
-    _smsReceiver.onSmsReceived.listen((SmsMessage message) {
-      if (message.sender == widget.sms.from) {
-        String code = widget.sms.formatBody != null
-            ? widget.sms.formatBody(message.body)
-            : message.body;
-        for (TextEditingController controller in _controllers) {
-          controller.text = code[_controllers.indexOf(controller)];
-          _pin[_controllers.indexOf(controller)] = controller.text;
-        }
-
-        widget.submit(_pin.join());
-      }
-    });
   }
 
   Widget _dash() {
